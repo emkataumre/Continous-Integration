@@ -25,8 +25,7 @@ jobs:
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.10.0
         with:
-          mongodb-version: ${{ matrix.mongodb-version }}
-
+          mongodb-version: latest
       - name: Install dependencies
         run: npm install
 
@@ -45,7 +44,7 @@ jobs:
           envkey_DEBUG: false
           envkey_SOME_API_KEY: '123456abcdef'
           envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
-          envkey_VARIABLE: ${{ env.SOME_ACTION_VARIABLE }}
+          # envkey_VARIABLE: ${{ env.SOME_ACTION_VARIABLE }}
           some_other_variable: foobar
           directory: continous-integration
           file_name: .env
