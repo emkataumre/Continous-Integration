@@ -16,5 +16,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-      - name: Check code formatting
-        run: eslint \"{src,apps,libs,test}/**/*.ts\" --fix
+
+      - name: Run ESLint
+        run: npx eslint "{src,apps,libs,test}/**/*.ts" --fix
