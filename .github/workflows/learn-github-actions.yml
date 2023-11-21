@@ -1,24 +1,53 @@
-name: learn-github-actions
+name: Run tests and Create envfile
+
 on:
   push:
+    branches:
+      - main
 
 jobs:
-  check-bats-version:
+  build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
+        mongodb-version: ['4.2', '4.4', '5.0', '6.0']
 
-      - name: Set up Node.js
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: ${{ matrix.node-version }}
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.10.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
 
       - name: Install dependencies
         run: npm install
 
-      - name: Install ESLint
-        run: npm install eslint --save-dev
+      - name: Run tests
+        run: npm test
+        env:
+          CI: true
 
-      - name: Run ESLint
-        run: eslint \"{src,apps,libs,test}/**/*.ts\" --fix
+  create-envfile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_DEBUG: false
+          envkey_SOME_API_KEY: '123456abcdef'
+          envkey_SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          envkey_VARIABLE: ${{ env.SOME_ACTION_VARIABLE }}
+          some_other_variable: foobar
+          directory: continous-integration
+          file_name: .env
+          fail_on_empty: false
+          sort_keys: false
